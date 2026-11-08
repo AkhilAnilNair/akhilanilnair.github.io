@@ -163,6 +163,42 @@ const {
       html.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
     });
+
+    // ── Clean URL in-page navigation (no bookmark hash in URL bar) ────
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+
+      const link = target.closest('a[href^="#"]');
+      if (!link) return;
+
+      const href = link.getAttribute('href');
+      if (!href || href === '#') return;
+
+      const destination = document.querySelector(href);
+      if (destination) {
+        e.preventDefault();
+        destination.scrollIntoView({ behavior: 'smooth' });
+
+        // Keep address bar clean without hash fragment
+        if (window.location.hash) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      }
+    });
+
+    // Clean address bar on load if visited with a direct hash
+    if (window.location.hash) {
+      const initialTarget = document.querySelector(window.location.hash);
+      if (initialTarget) {
+        setTimeout(() => {
+          initialTarget.scrollIntoView({ behavior: 'smooth' });
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }, 100);
+      } else {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
   </script>
 </body>
 </html>

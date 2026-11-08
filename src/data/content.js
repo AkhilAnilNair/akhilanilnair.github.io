@@ -16,9 +16,9 @@ export const person = {
   role: "Backend Software Engineer",
   tagline:
     "I build secure, distributed backend systems — microservices, APIs, and event-driven pipelines that run at scale.",
-  email: "hello@example.com",               // [TODO: replace with your email]
-  linkedin: "https://linkedin.com/in/your-handle", // [TODO]
-  github: "https://github.com/your-handle",         // [TODO]
+  email: "akhil.a.nair760@gmail.com",
+  linkedin: "https://www.linkedin.com/in/akhilanilnair/",
+  github: "https://github.com/AkhilAnilNair",
   resumeUrl: "/resume.pdf",                 // drop resume.pdf in public/
 };
 
@@ -33,15 +33,53 @@ export const experience = [
   {
     company: "Jio Platforms Limited",
     location: "Mumbai, India",
-    title: "Software Development Engineer 1 (SDE 1)",
+    title: "Software Development Engineer",
     start: "Dec 2023",
     end: "Present",
     bullets: [
-      "[TODO: Describe your primary responsibility — e.g., 'Designed and owned the X microservice, reducing Y latency by Z%.']",
-      "[TODO: Second bullet — architecture decision, API design, data pipeline, reliability improvement, etc.]",
-      "[TODO: Third bullet — optional; drop if you only have two strong ones.]",
+      "Designed and developed end-to-end features for enterprise security products (SIEM) serving government organizations and multinational enterprises, processing over 500 million security event logs daily.",
+      "Built fault-tolerant data pipelines using Apache Kafka, Logstash, and Vector to decouple core ingestion services, sustaining peak throughput of 10,000 events per second at 99.9% availability.",
+      "Stress-tested system limits, identified edge cases, and resolved production bottlenecks with cross-functional teams, reducing recurring incidents by 25% and average resolution time by 35%.",
+      "Mentored newly onboarded associate engineers on system design, code quality standards, and feature implementation.",
+      "Received the Emerging Leader Award (2025) and the highest appraisal rating (A*) in every appraisal cycle since joining, placing among the top 5% of performers.",
     ],
-    stack: ["Java", "Spring Boot", "Microservices", "SIEM"],
+    stack: ["Java", "Spring Boot", "Apache Kafka", "Logstash", "Vector", "SIEM", "Distributed Systems"],
+  },
+  {
+    company: "Mandet India",
+    location: "Pune, India",
+    title: "Software Developer",
+    start: "Aug 2023",
+    end: "Nov 2023",
+    bullets: [
+      "Led a group of 5 interns, overseeing sprint planning and task management in an Agile environment while contributing hands-on to feature development.",
+      "Enhanced existing product functionality through iterative design and development, driving operational efficiency of the users.",
+    ],
+    stack: ["Agile", "Sprint Planning", "Feature Development", "Code Reviews"],
+  },
+  {
+    company: "Mandet India",
+    location: "Pune, India",
+    title: "Frontend Developer Intern",
+    start: "Mar 2021",
+    end: "Mar 2022",
+    bullets: [
+      "Developed React components for Learning Management Platform.",
+      "Planned and decomposed client requirements into Agile sprints, designing Figma wireframes and conducted peer code reviews to ensure on-schedule releases.",
+    ],
+    stack: ["React", "JavaScript", "Figma", "Agile", "UI/UX"],
+  },
+  {
+    company: "Mass Technologies LLC",
+    location: "Pune, India",
+    title: "Machine Learning Intern",
+    start: "Oct 2020",
+    end: "Nov 2020",
+    bullets: [
+      "Conducted data preprocessing and exploratory analysis on multi-dimensional public datasets.",
+      "Engineered predictive models using Scikit-Learn, utilizing grid and random search hyperparameter tuning to maximize model efficiency and accuracy.",
+    ],
+    stack: ["Python", "Scikit-Learn", "Machine Learning", "EDA"],
   },
 ];
 
@@ -80,46 +118,81 @@ export const projects = [
 
 export const skills = [
   {
-    group: "Languages",
-    items: ["Java", "SQL", "Bash"],
-    // [TODO: add others you use, e.g. Python, Go]
+    group: "Programming Languages",
+    items: ["Java", "Python", "C++", "JavaScript", "SQL", "Bash"],
   },
   {
-    group: "Backend & Frameworks",
-    items: ["Spring Boot", "Spring Security", "REST APIs", "Microservices"],
-    // [TODO: add e.g. gRPC, Kafka Streams]
+    group: "Backend & Architecture",
+    items: [
+      "Spring Boot",
+      "Spring Data JPA",
+      "REST APIs",
+      "Microservices",
+      "Distributed Systems",
+      "Event-Driven Architecture",
+    ],
   },
   {
-    group: "Databases & Messaging",
-    items: ["[TODO]", "[TODO]"],
-    // e.g. PostgreSQL, MySQL, Redis, Kafka, RabbitMQ
+    group: "Databases",
+    items: ["PostgreSQL", "MySQL", "Elasticsearch", "Redis", "MongoDB", "Quickwit"],
   },
   {
-    group: "Cloud & DevOps",
-    items: ["[TODO]", "[TODO]"],
-    // e.g. AWS, Docker, Kubernetes, CI/CD
+    group: "Messaging & Data Pipelines",
+    items: ["Kafka", "RabbitMQ", "Logstash", "Vector"],
   },
   {
-    group: "Tools",
-    items: ["Git", "IntelliJ IDEA", "Postman", "[TODO]"],
+    group: "AI / ML & LLMs",
+    items: [
+      "TensorFlow",
+      "Scikit-Learn",
+      "Keras",
+      "Model Context Protocol",
+      "Prompt Engineering",
+    ],
+  },
+  {
+    group: "Cloud, DevOps & Tools",
+    items: [
+      "Git",
+      "Docker",
+      "Kubernetes",
+      "AWS (EC2, S3, Lambda)",
+      "Figma",
+      "Postman",
+    ],
+  },
+  {
+    group: "Frontend",
+    items: ["React.js", "Bootstrap"],
+  },
+  {
+    group: "Testing & Operating Systems",
+    items: ["JUnit", "SonarQube", "Test-Driven Development (TDD)", "Linux", "Windows"],
   },
 ];
 
 export const education = [
   {
     degree: "Bachelor of Engineering — Information Technology",
+    college: "NBN Sinhgad School of Engineering",
     institution: "Savitribai Phule Pune University",
-    year: "2023",
+    location: "Pune, India",
+    year: "Aug 2019 – May 2023",
   },
 ];
 
 export const publications = [
   {
-    title:
-      "English-to-Hindi Neural Machine Translation Using Transformer Models",
+    title: "TaaS: Translation as a Service (Transformer Based Translator)",
+    authors: "A. A et al.",
     venue: "IEEE ICCUBEA 2023",
+    conference: "2023 7th International Conference on Computing, Communication, Control and Automation (ICCUBEA)",
+    location: "Pune, India",
     year: "2023",
-    url: "", // [TODO: add IEEE DOI/link if available]
+    pages: "pp. 1-4",
+    doi: "10.1109/ICCUBEA58933.2023.10392049",
+    url: "https://doi.org/10.1109/ICCUBEA58933.2023.10392049",
+    keywords: ["Transformers", "Neural Machine Translation", "TaaS", "Low-Resource Languages"],
   },
 ];
 

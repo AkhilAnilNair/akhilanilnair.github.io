@@ -33,9 +33,10 @@ const { title, description, ogImage, url } = site;
 </Layout>
 
 <style is:global>
-  /* Slight alternating background tint on even sections for visual rhythm */
+  /* Alternating background tint & subtle hairline dividers on even sections for visual rhythm */
   main > section:nth-child(even) {
-    background: var(--surface);
-    transition: background-color 0.25s ease;
+    background: var(--surface-alt);
+    border-block: 1px solid var(--border);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
   }
 </style>

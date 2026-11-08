@@ -13,7 +13,7 @@ const allTags = ['all', ...new Set(projects.flatMap((p) => p.stack).filter(Boole
 <section id="projects" class="fade-in">
   <div class="container">
     <p class="section-label">Projects</p>
-    <h2 class="section-title">Selected Work</h2>
+    <h2 class="section-title">Selected <span class="gradient-text">Work</span></h2>
 
     <!-- Feature 4: Filter bar -->
     <div
@@ -205,12 +205,16 @@ const allTags = ['all', ...new Set(projects.flatMap((p) => p.stack).filter(Boole
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
     /* opacity/border transitions in global.css */
     transition: border-color 0.2s, opacity 0.2s ease,
-                background-color 0.25s ease;
+                background-color 0.25s ease, box-shadow 0.2s ease,
+                transform 0.2s ease;
   }
   .project-card:hover {
     border-color: var(--accent);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
   }
 
   .card-top { display: flex; flex-direction: column; gap: 0.3rem; }

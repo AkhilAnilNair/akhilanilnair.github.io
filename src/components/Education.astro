@@ -5,18 +5,36 @@ import { education, publications } from '../data/content.js';
 <section id="education" class="fade-in">
   <div class="container">
     <p class="section-label">Education & Publications</p>
-    <h2 class="section-title">Academic Background</h2>
+    <h2 class="section-title">Academic <span class="gradient-text">Background</span></h2>
 
     <!-- Education -->
     <div class="subsection">
       <h3 class="sub-heading">Education</h3>
       {education.map((edu) => (
         <div class="edu-item">
-          <div class="edu-main">
-            <p class="edu-degree">{edu.degree}</p>
-            <p class="edu-inst muted">{edu.institution}</p>
+          <div class="edu-header">
+            <div class="edu-info">
+              <h4 class="edu-degree">{edu.degree}</h4>
+              <p class="edu-college">{edu.college}</p>
+              {edu.institution && (
+                <p class="edu-university muted">Affiliated with {edu.institution}</p>
+              )}
+            </div>
+
+            <div class="edu-meta mono muted">
+              <span class="edu-duration">{edu.year}</span>
+              {edu.location && (
+                <span class="edu-location">
+                  <!-- Small map pin icon -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  {edu.location}
+                </span>
+              )}
+            </div>
           </div>
-          <span class="mono muted edu-year">{edu.year}</span>
         </div>
       ))}
     </div>
@@ -27,13 +45,41 @@ import { education, publications } from '../data/content.js';
       {publications.map((pub) => (
         <div class="pub-item">
           <div class="pub-main">
-            <p class="pub-title">
-              {pub.url
-                ? <a href={pub.url} target="_blank" rel="noopener noreferrer">{pub.title}</a>
-                : pub.title
-              }
+            <h4 class="pub-title">
+              {pub.url ? (
+                <a href={pub.url} target="_blank" rel="noopener noreferrer" class="pub-link">
+                  <span>{pub.title}</span>
+                  <svg class="pub-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                </a>
+              ) : (
+                pub.title
+              )}
+            </h4>
+
+            <p class="pub-venue mono muted">
+              <span>{pub.venue}</span>
+              {pub.location && <span> · {pub.location}</span>}
+              <span> · {pub.year}</span>
+              {pub.pages && <span> · {pub.pages}</span>}
             </p>
-            <p class="pub-venue mono muted">{pub.venue} · {pub.year}</p>
+
+            {pub.doi && (
+              <p class="pub-doi mono muted">
+                DOI: <a href={pub.url || `https://doi.org/${pub.doi}`} target="_blank" rel="noopener noreferrer">{pub.doi}</a>
+              </p>
+            )}
+
+            {pub.keywords && pub.keywords.length > 0 && (
+              <div class="tag-row pub-tags">
+                {pub.keywords.map((kw) => (
+                  <span class="tag">{kw}</span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       ))}
@@ -56,7 +102,70 @@ import { education, publications } from '../data/content.js';
     font-weight: 500;
   }
 
-  .edu-item, .pub-item {
+  /* ── Education Layout ── */
+  .edu-item {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .edu-item:first-of-type {
+    border-top: 1px solid var(--border);
+  }
+
+  .edu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .edu-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .edu-degree {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+  }
+
+  .edu-college {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .edu-university {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .edu-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    padding-top: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  .edu-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .edu-location svg {
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ── Publications Layout ── */
+  .pub-item {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -64,36 +173,79 @@ import { education, publications } from '../data/content.js';
     padding: 1rem 0;
     border-bottom: 1px solid var(--border);
   }
-  .edu-item:first-of-type, .pub-item:first-of-type {
+  .pub-item:first-of-type {
     border-top: 1px solid var(--border);
   }
 
-  .edu-degree {
-    font-weight: 500;
-    color: var(--text);
-    font-size: 0.95rem;
-  }
-
-  .edu-inst {
-    font-size: 0.875rem;
-    margin-top: 0.1rem;
-  }
-
-  .edu-year {
-    font-size: 0.78rem;
-    white-space: nowrap;
-    padding-top: 0.1rem;
-  }
-
   .pub-title {
-    font-size: 0.95rem;
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .pub-link {
     color: var(--text);
-    font-weight: 500;
-    line-height: 1.5;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    transition: color 0.2s ease;
+  }
+
+  .pub-link:hover {
+    color: var(--accent);
+  }
+
+  .pub-icon {
+    flex-shrink: 0;
+    align-self: center;
+    color: var(--accent);
   }
 
   .pub-venue {
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+  }
+
+  .pub-doi {
     font-size: 0.78rem;
     margin-top: 0.25rem;
+  }
+
+  .pub-doi a {
+    color: var(--muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .pub-doi a:hover {
+    color: var(--accent);
+  }
+
+  .pub-tags {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  /* ── Mobile Breakpoint ── */
+  @media (max-width: 600px) {
+    .edu-header {
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .edu-meta {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .pub-item {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
   }
 </style>

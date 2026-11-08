@@ -14,7 +14,7 @@ import { person } from '../data/content.js';
 
   <div class="container hero-inner">
     <p class="hero-eyebrow mono muted">Hi, I'm</p>
-    <h1 class="hero-name">{person.name}</h1>
+    <h1 class="hero-name"><span class="gradient-text">{person.name}</span></h1>
     <p class="hero-role">{person.role}</p>
     <p class="hero-tagline">{person.tagline}</p>
 
@@ -31,6 +31,32 @@ import { person } from '../data/content.js';
           <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
         Download Resume
+      </a>
+    </div>
+
+    <div class="hero-socials">
+      <!-- GitHub icon -->
+      <a href={person.github} target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="GitHub Profile" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+        </svg>
+      </a>
+
+      <!-- LinkedIn icon -->
+      <a href={person.linkedin} target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="LinkedIn Profile" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+          <rect x="2" y="9" width="4" height="12"/>
+          <circle cx="4" cy="4" r="2"/>
+        </svg>
+      </a>
+
+      <!-- Email icon -->
+      <a href={`mailto:${person.email}`} class="social-btn" aria-label="Send Email" title="Email">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
       </a>
     </div>
   </div>
@@ -286,6 +312,35 @@ import { person } from '../data/content.js';
     flex-wrap: wrap;
     gap: 0.75rem;
     margin-top: 2.25rem;
+  }
+
+  .hero-socials {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+  }
+
+  .social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease,
+                background-color 0.25s ease, box-shadow 0.2s ease;
+  }
+
+  .social-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
   }
 
   @media (max-width: 480px) {

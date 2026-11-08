@@ -9,12 +9,13 @@
 
 /* ── CSS Custom Properties ── */
 :root {
-  --bg:       #FAFAFC;
-  --surface:  #FFFFFF;
-  --border:   #E4E4EE;
-  --text:     #14141F;
-  --muted:    #5B5B70;
-  --accent:   #6D28D9;
+  --bg:          #FFFFFF;
+  --surface:     #FFFFFF;
+  --surface-alt: #F4F4F8;
+  --border:      #E4E4EE;
+  --text:        #14141F;
+  --muted:       #5B5B70;
+  --accent:      #6D28D9;
 
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -34,12 +35,13 @@
 }
 
 [data-theme="dark"] {
-  --bg:       #0B0B10;
-  --surface:  #15151E;
-  --border:   #26263A;
-  --text:     #ECECF3;
-  --muted:    #A1A1B5;
-  --accent:   #A78BFA;
+  --bg:          #0B0B10;
+  --surface:     #14141E;
+  --surface-alt: #0E0E15;
+  --border:      #222234;
+  --text:        #ECECF3;
+  --muted:       #A1A1B5;
+  --accent:      #A78BFA;
 
   --hero-grid-color:            rgba(255, 255, 255, 0.075);
   --hero-glow-opacity:          0.08;
@@ -116,6 +118,18 @@ section {
   font-size: clamp(1.5rem, 4vw, 2rem);
   color: var(--text);
   margin-bottom: 2.5rem;
+}
+
+/* ── Gradient Text Highlight ── */
+.gradient-text {
+  background-image: linear-gradient(135deg, #7C3AED 0%, #D41872 50%, #FB517D 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 /* ── Fade-in on scroll (Feature 2) ── */
