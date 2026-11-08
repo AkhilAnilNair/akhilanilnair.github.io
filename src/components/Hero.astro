@@ -3,6 +3,15 @@
 import { person } from '../data/content.js';
 ---
 <section id="hero" class="hero">
+  <!-- Cartesian plane (squares) fading away from center to edges with interactive cursor gradient -->
+  <div class="hero-grid-plane" aria-hidden="true">
+    <div class="hero-grid-base"></div>
+    <div class="hero-grid-spotlight">
+      <div class="hero-spotlight-glow"></div>
+      <div class="hero-spotlight-lines"></div>
+    </div>
+  </div>
+
   <div class="container hero-inner">
     <p class="hero-eyebrow mono muted">Hi, I'm</p>
     <h1 class="hero-name">{person.name}</h1>
@@ -27,12 +36,220 @@ import { person } from '../data/content.js';
   </div>
 </section>
 
+<script>
+  function setupHeroGrid() {
+    const hero = document.getElementById('hero');
+    if (!hero) return;
+
+    const spotlight = hero.querySelector('.hero-grid-spotlight');
+    if (!spotlight) return;
+
+    let rafId = null;
+    let targetX = -9999;
+    let targetY = -9999;
+    let currentX = -9999;
+    let currentY = -9999;
+    let isHovered = false;
+
+    const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function render() {
+      if (isReducedMotion) {
+        currentX = targetX;
+        currentY = targetY;
+        hero.style.setProperty('--mouse-x', `${currentX}px`);
+        hero.style.setProperty('--mouse-y', `${currentY}px`);
+        rafId = null;
+        return;
+      }
+
+      // Smooth trailing factor for fluid motion
+      const dx = targetX - currentX;
+      const dy = targetY - currentY;
+      currentX += dx * 0.22;
+      currentY += dy * 0.22;
+
+      hero.style.setProperty('--mouse-x', `${currentX.toFixed(1)}px`);
+      hero.style.setProperty('--mouse-y', `${currentY.toFixed(1)}px`);
+
+      if (Math.hypot(dx, dy) > 0.2 && isHovered) {
+        rafId = requestAnimationFrame(render);
+      } else {
+        currentX = targetX;
+        currentY = targetY;
+        hero.style.setProperty('--mouse-x', `${currentX}px`);
+        hero.style.setProperty('--mouse-y', `${currentY}px`);
+        rafId = null;
+      }
+    }
+
+    hero.addEventListener('pointerenter', (e) => {
+      const rect = hero.getBoundingClientRect();
+      targetX = e.clientX - rect.left;
+      targetY = e.clientY - rect.top;
+      currentX = targetX;
+      currentY = targetY;
+      hero.style.setProperty('--mouse-x', `${currentX}px`);
+      hero.style.setProperty('--mouse-y', `${currentY}px`);
+      isHovered = true;
+      spotlight.classList.add('is-active');
+    });
+
+    hero.addEventListener('pointermove', (e) => {
+      const rect = hero.getBoundingClientRect();
+      targetX = e.clientX - rect.left;
+      targetY = e.clientY - rect.top;
+
+      if (!isHovered) {
+        isHovered = true;
+        spotlight.classList.add('is-active');
+      }
+
+      if (!rafId) {
+        rafId = requestAnimationFrame(render);
+      }
+    }, { passive: true });
+
+    hero.addEventListener('pointerleave', () => {
+      isHovered = false;
+      spotlight.classList.remove('is-active');
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    });
+  }
+
+  setupHeroGrid();
+  document.addEventListener('astro:page-load', setupHeroGrid);
+</script>
+
 <style>
   .hero {
+    position: relative;
+    overflow: hidden;
     padding-block: 7rem 5rem;
     min-height: 85svh;
     display: flex;
     align-items: center;
+    --grid-size: 55px;
+    --spotlight-radius: 260px;
+    --mouse-x: -9999px;
+    --mouse-y: -9999px;
+  }
+
+  /* Cartesian Plane Container */
+  .hero-grid-plane {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  /* Base Cartesian Plane: square grid fading away from center to edges */
+  .hero-grid-base {
+    position: absolute;
+    inset: 0;
+    background-size: var(--grid-size) var(--grid-size);
+    background-position: center center;
+    background-image:
+      linear-gradient(to right, var(--hero-grid-color, rgba(20, 20, 31, 0.08)) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--hero-grid-color, rgba(20, 20, 31, 0.08)) 1px, transparent 1px);
+    mask-image: radial-gradient(
+      ellipse 70% 65% at 50% 50%,
+      #000 15%,
+      rgba(0, 0, 0, 0.45) 50%,
+      transparent 80%
+    );
+    -webkit-mask-image: radial-gradient(
+      ellipse 70% 65% at 50% 50%,
+      #000 15%,
+      rgba(0, 0, 0, 0.45) 50%,
+      transparent 80%
+    );
+  }
+
+  /* Interactive Hover Spotlight: enlarged soft radius around cursor */
+  .hero-grid-spotlight {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    will-change: mask-position, -webkit-mask-position, opacity;
+    mask-image: radial-gradient(
+      circle var(--spotlight-radius, 260px) at var(--mouse-x) var(--mouse-y),
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.45) 35%,
+      rgba(0, 0, 0, 0.18) 65%,
+      transparent 100%
+    );
+    -webkit-mask-image: radial-gradient(
+      circle var(--spotlight-radius, 260px) at var(--mouse-x) var(--mouse-y),
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.45) 35%,
+      rgba(0, 0, 0, 0.18) 65%,
+      transparent 100%
+    );
+  }
+
+  .hero-grid-spotlight.is-active {
+    opacity: 1;
+  }
+
+  /* Slowly moving animated gradient matching the portfolio's accent aesthetic */
+  .hero-spotlight-glow,
+  .hero-spotlight-lines {
+    position: absolute;
+    inset: 0;
+    background: var(--hero-gradient, linear-gradient(135deg, #6D28D9 0%, #4F46E5 35%, #06B6D4 70%, #6D28D9 100%));
+    background-size: 300% 300%;
+    animation: heroGradientShift 8s ease-in-out infinite alternate;
+  }
+
+  /* Subtle ambient glow in the square cells around mouse */
+  .hero-spotlight-glow {
+    opacity: var(--hero-glow-opacity, 0.05);
+  }
+
+  /* Highlighted Cartesian grid lines around mouse — subtle and refined */
+  .hero-spotlight-lines {
+    opacity: var(--hero-lines-highlight-opacity, 0.55);
+    mask-image:
+      linear-gradient(to right, #000 1px, transparent 1px),
+      linear-gradient(to bottom, #000 1px, transparent 1px);
+    -webkit-mask-image:
+      linear-gradient(to right, #000 1px, transparent 1px),
+      linear-gradient(to bottom, #000 1px, transparent 1px);
+    mask-size: var(--grid-size) var(--grid-size);
+    -webkit-mask-size: var(--grid-size) var(--grid-size);
+    mask-position: center center;
+    -webkit-mask-position: center center;
+  }
+
+  @keyframes heroGradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-spotlight-glow,
+    .hero-spotlight-lines {
+      animation: none;
+    }
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
   }
 
   .hero-eyebrow {
