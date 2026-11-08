@@ -69,7 +69,7 @@ import { certifications } from '../data/content.js';
   /* ── Grid layout ── */
   .cert-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
     gap: 1.25rem;
     margin-top: 0.5rem;
   }
@@ -78,12 +78,14 @@ import { certifications } from '../data/content.js';
   .cert-card {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    padding: 1.25rem 1.4rem;
+    gap: 0.85rem;
+    padding: 1.25rem 1.35rem;
     border: 1px solid var(--border);
     border-radius: 10px;
     background: var(--surface);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    min-width: 0; /* Prevents flex children from causing overflow */
+    box-sizing: border-box;
   }
   .cert-card:hover {
     border-color: var(--accent);
@@ -98,6 +100,7 @@ import { certifications } from '../data/content.js';
     justify-content: space-between;
     gap: 0.5rem;
     flex-wrap: wrap;
+    min-width: 0;
   }
 
   .cert-issuer-wrap {
@@ -105,6 +108,7 @@ import { certifications } from '../data/content.js';
     align-items: center;
     gap: 0.45rem;
     flex-wrap: wrap;
+    min-width: 0;
   }
 
   /* Platform badge */
@@ -116,6 +120,7 @@ import { certifications } from '../data/content.js';
     text-transform: uppercase;
     padding: 0.2rem 0.55rem;
     border-radius: 4px;
+    white-space: nowrap;
   }
   .badge-coursera {
     background: color-mix(in srgb, #0056D2 12%, transparent);
@@ -140,6 +145,7 @@ import { certifications } from '../data/content.js';
 
   .cert-offered-by {
     font-size: 0.75rem;
+    white-space: nowrap;
   }
 
   .cert-year {
@@ -149,17 +155,22 @@ import { certifications } from '../data/content.js';
 
   /* ── Title ── */
   .cert-title {
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     font-weight: 600;
     color: var(--text);
     line-height: 1.4;
     margin: 0;
     flex: 1;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
   /* ── Tags ── */
   .cert-tags {
     margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
   }
 
   /* ── Footer: ID + verify ── */
@@ -167,10 +178,12 @@ import { certifications } from '../data/content.js';
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
-    padding-top: 0.6rem;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
     border-top: 1px solid var(--border);
     margin-top: auto;
+    flex-wrap: wrap;
+    min-width: 0;
   }
 
   .cert-id {
@@ -178,7 +191,10 @@ import { certifications } from '../data/content.js';
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 55%;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 
   .cert-verify-btn {
@@ -189,12 +205,13 @@ import { certifications } from '../data/content.js';
     font-weight: 600;
     color: var(--accent);
     text-decoration: none;
-    padding: 0.25rem 0.6rem;
+    padding: 0.25rem 0.65rem;
     border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
     border-radius: 4px;
     transition: background 0.15s ease, color 0.15s ease;
     white-space: nowrap;
     cursor: pointer;
+    flex-shrink: 0;
   }
   .cert-verify-btn:hover {
     background: color-mix(in srgb, var(--accent) 10%, transparent);
@@ -205,7 +222,21 @@ import { certifications } from '../data/content.js';
     pointer-events: none;
   }
 
-  @media (max-width: 540px) {
-    .cert-grid { grid-template-columns: 1fr; }
+  @media (max-width: 600px) {
+    .cert-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .cert-card {
+      padding: 1.15rem 1.15rem;
+    }
+
+    .cert-footer {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
   }
 </style>
