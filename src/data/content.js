@@ -85,35 +85,17 @@ export const experience = [
 
 export const projects = [
   {
-    title: "[TODO: Project Name]",
-    description: "[TODO: One-line description of what the project does.]",
-    problem:  "[TODO: What problem does it solve?]",
-    approach: "[TODO: Architecture or key technical decisions.]",
-    impact:   "[TODO: Measurable outcome — latency, throughput, reliability, etc.]",
-    stack: ["Java", "Spring Boot"],         // [TODO: actual stack]
-    github: "",                             // [TODO: GitHub URL or leave empty]
-    live: "",                               // [TODO: live URL or leave empty]
-  },
-  {
-    title: "[TODO: Project Name]",
-    description: "[TODO: One-line description.]",
-    problem:  "[TODO: Problem statement.]",
-    approach: "[TODO: Approach.]",
-    impact:   "[TODO: Measurable outcome.]",
-    stack: [],
+    title: "Translation as a Service (TaaS) using Transformer Architecture",
+    period: "August 2022 – March 2023",
+    description: "Neural machine translation system for English-Hindi, trained on constrained compute to study translation quality trade-offs.",
+    problem:  "Exploring how translation quality degrades under constrained compute, particularly for long and complex sentences.",
+    approach: "Led a team of five under the Head of Department; trained a Transformer-based neural translation model on an NVIDIA P100 GPU. Preprocessed English-Hindi corpora (Samanantar, IIT Bombay) through outlier filtering, text normalization, and tokenization.",
+    impact:   "Achieved an average sentence-level BLEU-2 score of 0.26; analyzed and documented quality degradation patterns on long, complex sentences.",
+    stack: ["Python", "PyTorch", "Transformers", "NVIDIA P100"],
     github: "",
     live: "",
   },
-  {
-    title: "[TODO: Project Name]",
-    description: "[TODO: One-line description.]",
-    problem:  "[TODO: Problem statement.]",
-    approach: "[TODO: Approach.]",
-    impact:   "[TODO: Measurable outcome.]",
-    stack: [],
-    github: "",
-    live: "",
-  },
+  // [TODO: Add more projects here]
 ];
 
 export const skills = [
@@ -196,11 +178,123 @@ export const publications = [
   },
 ];
 
+export const certifications = [
+  {
+    title: "Introduction to Java and Object-Oriented Programming",
+    issuer: "Coursera",
+    issuedBy: "University of Pennsylvania",
+    issueDate: "2024",
+    credentialId: "XXXXXXXXXXXXXXXX",        // [TODO: Replace with your actual Credential ID]
+    credentialUrl: "",                       // [TODO: Add Coursera certificate verification link]
+    skills: ["Java", "OOP", "Data Structures"],
+  },
+  {
+    title: "Spring Framework and Spring Boot",
+    issuer: "Coursera",
+    issuedBy: "LearnQuest",
+    issueDate: "2024",
+    credentialId: "XXXXXXXXXXXXXXXX",        // [TODO: Replace with your actual Credential ID]
+    credentialUrl: "",                       // [TODO: Add Coursera certificate verification link]
+    skills: ["Spring Boot", "REST APIs", "Java"],
+  },
+  {
+    title: "Learning Docker",
+    issuer: "LinkedIn Learning",
+    issuedBy: "LinkedIn Learning",
+    issueDate: "2023",
+    credentialId: "XXXXXXXXXXXXXXXX",        // [TODO: Replace with your actual Credential ID]
+    credentialUrl: "",                       // [TODO: Add LinkedIn Learning certificate link]
+    skills: ["Docker", "Containerization", "DevOps"],
+  },
+  {
+    title: "Apache Kafka Essential Training",
+    issuer: "LinkedIn Learning",
+    issuedBy: "LinkedIn Learning",
+    issueDate: "2024",
+    credentialId: "XXXXXXXXXXXXXXXX",        // [TODO: Replace with your actual Credential ID]
+    credentialUrl: "",                       // [TODO: Add LinkedIn Learning certificate link]
+    skills: ["Apache Kafka", "Event-Driven Architecture", "Distributed Systems"],
+  },
+];
+
+export const achievements = [
+  {
+    title: "Emerging Leader Award",
+    organization: "Jio Platforms Limited",
+    location: "Mumbai",
+    year: "2025",
+    description: "Recognised for exceptional technical contributions, ownership, and leadership within the SIEM platform team.",
+    highlight: true,
+  },
+  {
+    title: "Departmental Rank Holder",
+    organization: "NBN Sinhgad School of Engineering",
+    location: "Pune",
+    year: "2023",
+    description: "Graduated with top academic distinction in the Information Technology department.",
+    highlight: false,
+  },
+  {
+    title: "Student of the Year",
+    organization: "NBN Sinhgad School of Engineering",
+    location: "Pune",
+    year: "2023",
+    description: "Awarded for outstanding all-round performance across academics, leadership, and extracurricular activities.",
+    highlight: false,
+  },
+];
+
+export const leadership = [
+  {
+    role: "Event Anchor",
+    organization: "NBN Sinhgad School of Engineering",
+    period: "2022 – 2023",
+    description: "Led a department-wide career guidance session as anchor; oversaw and guided junior students in managing related programs, fostering collaborative engagement between faculty and students.",
+  },
+  {
+    role: "Chief Editor, Departmental Newsletter",
+    organization: "NBN Sinhgad School of Engineering",
+    period: "2021 – 2022",
+    description: "Led the editorial board in curating, reviewing, and publishing technical articles across multiple editions of the departmental newsletter.",
+  },
+  {
+    role: "Class Representative",
+    organization: "NBN Sinhgad School of Engineering",
+    period: "2020 – 2023",
+    description: "Served as the primary liaison between faculty and 60+ students, coordinating academic schedules, communicating institutional updates, and advocating for student concerns.",
+  },
+];
+
+export const community = [
+  {
+    organization: "Bond Socially (NGO)",
+    location: "Pune",
+    period: "2020 – 2023",
+    role: "Volunteer",
+    bullets: [
+      "Cooked and packed meals across 8 food distribution drives, each serving 100–150 people from underserved communities.",
+      "Participated in 5 tree plantation and maintenance drives across two hillside locations.",
+      "Collaborated with 12 volunteers on an environmental cleanliness drive at Torna Fort.",
+    ],
+  },
+  {
+    organization: "Voluntary Blood Donor",
+    location: "Pune & Mumbai",
+    period: "2019 – Present",
+    role: "Donor",
+    bullets: [
+      "Participated in 10+ voluntary blood donation campaigns across Pune and Mumbai.",
+    ],
+  },
+];
+
 export const nav = [
-  { label: "About",      href: "#about" },
-  { label: "Experience", href: "#experience" },
-  { label: "Projects",   href: "#projects" },
-  { label: "Skills",     href: "#skills" },
-  { label: "Education",  href: "#education" },
-  { label: "Contact",    href: "#contact" },
+  { label: "About",          href: "#about" },
+  { label: "Experience",     href: "#experience" },
+  { label: "Projects",       href: "#projects" },
+  { label: "Skills",         href: "#skills" },
+  { label: "Education",      href: "#education" },
+  { label: "Certifications", href: "#certifications" },
+  { label: "Involvement",    href: "#involvement" },
+  { label: "Contact",        href: "#contact" },
 ];

@@ -47,6 +47,7 @@ const allTags = ['all', ...new Set(projects.flatMap((p) => p.stack).filter(Boole
           <!-- Always-visible top section -->
           <div class="card-top">
             <h3 class="card-title">{project.title}</h3>
+            {project.period && <span class="card-period">{project.period}</span>}
             <p class="card-desc">{project.description}</p>
           </div>
 
@@ -223,6 +224,13 @@ const allTags = ['all', ...new Set(projects.flatMap((p) => p.stack).filter(Boole
     font-size: 1.05rem;
     font-weight: 600;
     color: var(--text);
+  }
+
+  .card-period {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
   }
 
   .card-desc {

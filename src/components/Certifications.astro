@@ -1,0 +1,211 @@
+---
+// src/components/Certifications.astro
+import { certifications } from '../data/content.js';
+---
+<section id="certifications" class="fade-in">
+  <div class="container">
+    <p class="section-label">Credentials</p>
+    <h2 class="section-title">Licenses &amp; <span class="gradient-text">Certifications</span></h2>
+
+    <div class="cert-grid">
+      {certifications.map((cert) => (
+        <div class="cert-card">
+          <!-- Issuer badge row -->
+          <div class="cert-header">
+            <div class="cert-issuer-wrap">
+              <span class={`cert-platform-badge ${cert.issuer === 'Coursera' ? 'badge-coursera' : 'badge-linkedin'}`}>
+                {cert.issuer}
+              </span>
+              {cert.issuedBy && cert.issuedBy !== cert.issuer && (
+                <span class="cert-offered-by muted">via {cert.issuedBy}</span>
+              )}
+            </div>
+            <span class="cert-year mono muted">{cert.issueDate}</span>
+          </div>
+
+          <!-- Cert title -->
+          <h3 class="cert-title">{cert.title}</h3>
+
+          <!-- Skill tags -->
+          {cert.skills && cert.skills.length > 0 && (
+            <div class="tag-row cert-tags">
+              {cert.skills.map((s) => <span class="tag">{s}</span>)}
+            </div>
+          )}
+
+          <!-- Footer: Credential ID + verify link -->
+          <div class="cert-footer">
+            {cert.credentialId && (
+              <span class="cert-id mono muted">ID: {cert.credentialId}</span>
+            )}
+            {cert.credentialUrl ? (
+              <a
+                href={cert.credentialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="cert-verify-btn"
+                aria-label={`Verify ${cert.title} certificate`}
+              >
+                Verify
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            ) : (
+              <span class="cert-verify-btn cert-verify-disabled" aria-disabled="true">Verify</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── Grid layout ── */
+  .cert-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Card ── */
+  .cert-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .cert-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px -8px color-mix(in srgb, var(--accent) 25%, transparent);
+    transform: translateY(-2px);
+  }
+
+  /* ── Header: issuer badge + year ── */
+  .cert-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cert-issuer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  /* Platform badge */
+  .cert-platform-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+  }
+  .badge-coursera {
+    background: color-mix(in srgb, #0056D2 12%, transparent);
+    color: #0056D2;
+    border: 1px solid color-mix(in srgb, #0056D2 25%, transparent);
+  }
+  :global([data-theme="dark"]) .badge-coursera {
+    background: color-mix(in srgb, #4A9EFF 15%, transparent);
+    color: #7DBFFF;
+    border-color: color-mix(in srgb, #4A9EFF 30%, transparent);
+  }
+  .badge-linkedin {
+    background: color-mix(in srgb, #0A66C2 12%, transparent);
+    color: #0A66C2;
+    border: 1px solid color-mix(in srgb, #0A66C2 25%, transparent);
+  }
+  :global([data-theme="dark"]) .badge-linkedin {
+    background: color-mix(in srgb, #4A9EFF 15%, transparent);
+    color: #7DBFFF;
+    border-color: color-mix(in srgb, #4A9EFF 30%, transparent);
+  }
+
+  .cert-offered-by {
+    font-size: 0.75rem;
+  }
+
+  .cert-year {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  /* ── Title ── */
+  .cert-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    margin: 0;
+    flex: 1;
+  }
+
+  /* ── Tags ── */
+  .cert-tags {
+    margin-top: auto;
+  }
+
+  /* ── Footer: ID + verify ── */
+  .cert-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  .cert-id {
+    font-size: 0.7rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 55%;
+  }
+
+  .cert-verify-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    border-radius: 4px;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .cert-verify-btn:hover {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  .cert-verify-disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  @media (max-width: 540px) {
+    .cert-grid { grid-template-columns: 1fr; }
+  }
+</style>
