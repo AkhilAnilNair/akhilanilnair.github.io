@@ -6,9 +6,9 @@
 export const site = {
   title: "Akhil Anil Nair — Backend Software Engineer",
   description:
-    "Backend Software Engineer specialising in Java, Spring Boot, and distributed microservices systems.",
-  url: "https://akhilanilnair.dev", // [TODO: update to your actual domain]
-  ogImage: "/og-image.png",         // [TODO: add an og-image to public/]
+    "Akhil Anil Nair — Backend Software Engineer at Jio Platforms, specialising in Java, Spring Boot, Apache Kafka, and distributed microservices systems. Based in India.",
+  url: "https://akhilanilnair.github.io",
+  ogImage: "/og-image.jpg",
 };
 
 export const person = {

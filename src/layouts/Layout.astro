@@ -11,10 +11,38 @@ import CustomCursor from '../components/CustomCursor.astro';
 
 const {
   title       = "Akhil Anil Nair — Backend Software Engineer",
-  description = "Backend Software Engineer specialising in Java, Spring Boot, and distributed microservices systems.",
-  ogImage     = "/og-image.png",
-  url         = "https://akhilanilnair.dev",
+  description = "Akhil Anil Nair — Backend Software Engineer at Jio Platforms, specialising in Java, Spring Boot, Apache Kafka, and distributed microservices systems. Based in India.",
+  ogImage     = "/og-image.jpg",
+  url         = "https://akhilanilnair.github.io",
 } = Astro.props;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Akhil Anil Nair",
+  "url": url,
+  "jobTitle": "Backend Software Engineer",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Jio Platforms Limited"
+  },
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "NBN Sinhgad School of Engineering"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Savitribai Phule Pune University"
+    }
+  ],
+  "sameAs": [
+    "https://www.linkedin.com/in/akhilanilnair/",
+    "https://github.com/AkhilAnilNair"
+  ],
+  "email": "akhil.a.nair760@gmail.com",
+  "knowsAbout": ["Java", "Spring Boot", "Apache Kafka", "Microservices", "SIEM", "Distributed Systems", "Python", "React"]
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -22,6 +50,12 @@ const {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
+  <meta name="author" content="Akhil Anil Nair" />
+  <meta name="keywords" content="Akhil Anil Nair, Backend Software Engineer, Java, Spring Boot, Apache Kafka, Microservices, SIEM, Jio Platforms, Distributed Systems, India" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#6D28D9" />
+
+  <link rel="canonical" href={url} />
 
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content={url} />
@@ -36,6 +70,8 @@ const {
 
   <title>{title}</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <!--
     Theme init — runs BEFORE paint to prevent flash of wrong theme.
