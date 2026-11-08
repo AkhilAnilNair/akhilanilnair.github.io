@@ -303,8 +303,12 @@ import { nav, person } from '../data/content.js';
   /* ── Responsive breakpoint ── */
   @media (max-width: 860px) {
     .nav-links  { display: none; }
-    .hamburger  { display: flex; }
-    /* Keep the cmd-trigger + theme toggle visible even on mobile */
-    .nav-actions { margin-left: auto; }
+    .hamburger  {
+      display: flex;
+      margin-left: 0;
+    }
+    .nav-actions {
+      margin-left: auto;
+    }
   }
 </style>

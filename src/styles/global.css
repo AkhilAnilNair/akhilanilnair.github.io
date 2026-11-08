@@ -558,8 +558,8 @@ section {
 .cmd-trigger-kbd {
   letter-spacing: 0.03em;
 }
-/* Hide the cmd-trigger button completely on mobile devices */
-@media (max-width: 768px) {
+/* Hide the cmd-trigger search button completely on mobile/tablet devices */
+@media (max-width: 860px) {
   .cmd-trigger { display: none !important; }
 }
 
