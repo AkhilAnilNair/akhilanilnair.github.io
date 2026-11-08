@@ -1,0 +1,168 @@
+---
+// src/components/Contact.astro
+// Feature 5: Copy-to-clipboard email button with aria-live confirmation.
+import { person } from '../data/content.js';
+---
+<section id="contact" class="fade-in">
+  <div class="container">
+    <p class="section-label">Contact</p>
+    <h2 class="section-title">Get in Touch</h2>
+
+    <p class="contact-intro muted">
+      Available for backend engineering roles. Reach out via email or LinkedIn.
+    </p>
+
+    <ul class="contact-list" role="list">
+
+      <!-- Email row with copy button -->
+      <li class="contact-item">
+        <!-- Email icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="contact-icon" aria-hidden="true">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+
+        <!-- Feature 5: email link + copy button side-by-side -->
+        <div class="copy-email-row">
+          <a href={`mailto:${person.email}`} class="contact-link">{person.email}</a>
+
+          <button
+            class="copy-btn"
+            id="copy-email-btn"
+            data-email={person.email}
+            aria-label="Copy email address to clipboard"
+          >
+            <!-- Clipboard icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy
+          </button>
+        </div>
+      </li>
+
+      <li class="contact-item">
+        <!-- LinkedIn icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="contact-icon" aria-hidden="true">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+          <rect x="2" y="9" width="4" height="12"/>
+          <circle cx="4" cy="4" r="2"/>
+        </svg>
+        <a href={person.linkedin} target="_blank" rel="noopener noreferrer" class="contact-link">
+          LinkedIn
+        </a>
+      </li>
+
+      <li class="contact-item">
+        <!-- GitHub icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="contact-icon" aria-hidden="true">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+        </svg>
+        <a href={person.github} target="_blank" rel="noopener noreferrer" class="contact-link">
+          GitHub
+        </a>
+      </li>
+    </ul>
+
+    <!--
+      Feature 5: aria-live="polite" region announces "Copied!" to screen readers
+      without interrupting ongoing speech. aria-atomic ensures the whole
+      message is read, not just the changed portion.
+      min-height in CSS prevents layout shift when text appears/disappears.
+    -->
+    <p
+      id="copy-status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></p>
+  </div>
+</section>
+
+<script>
+  // ── Feature 5: Copy email to clipboard ──────────────────────────────
+  const copyBtn  = document.getElementById('copy-email-btn');
+  const status   = document.getElementById('copy-status');
+  let clearTimer = null;
+
+  function showStatus(msg) {
+    if (!status) return;
+    status.textContent = msg;
+    clearTimeout(clearTimer);
+    // Clear after 2 s — matches the natural "flash" expectation
+    clearTimer = setTimeout(() => { status.textContent = ''; }, 2000);
+  }
+
+  copyBtn?.addEventListener('click', async () => {
+    const email = copyBtn.dataset.email;
+    if (!email) return;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        // Modern Clipboard API (requires HTTPS or localhost)
+        await navigator.clipboard.writeText(email);
+      } else {
+        // Graceful fallback for environments without Clipboard API
+        const tmp = document.createElement('textarea');
+        tmp.value = email;
+        tmp.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand('copy');
+        document.body.removeChild(tmp);
+      }
+      showStatus('Copied!');
+    } catch {
+      showStatus('Could not copy — try manually.');
+    }
+  });
+</script>
+
+<style>
+  .contact-intro {
+    max-width: 480px;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .contact-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .contact-icon {
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .contact-link {
+    font-size: 0.95rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .contact-link:hover { color: var(--accent); }
+
+  /* copy-email-row, copy-btn, #copy-status are styled in global.css */
+</style>

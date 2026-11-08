@@ -1,0 +1,240 @@
+---
+// src/components/CustomCursor.astro
+// Custom cursor with instant center dot and smooth real-time follower circle.
+// Increases size and light glow on hyperlinks.
+// Disabled on touch/mobile and when prefers-reduced-motion is active.
+---
+
+<div id="cursor-dot" class="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-circle" class="cursor-circle" aria-hidden="true"></div>
+
+<script>
+  // Only activate custom cursor on devices with fine pointer (mouse/trackpad)
+  const isFinePointer = window.matchMedia('(pointer: fine) and (hover: hover)').matches;
+  const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (isFinePointer && !isReducedMotion) {
+    const dot = document.getElementById('cursor-dot');
+    const circle = document.getElementById('cursor-circle');
+
+    if (dot && circle) {
+      let hasMoved = false;
+      let rafId = null;
+      let lastTime = 0;
+      let mouseX = 0;
+      let mouseY = 0;
+      let circleX = 0;
+      let circleY = 0;
+
+      // Smooth trailing factor: higher = snappier, lower = more floaty lag
+      const SMOOTH_FACTOR = 15;
+
+      function render(currentTime) {
+        if (!lastTime) {
+          lastTime = currentTime;
+        }
+        const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
+        lastTime = currentTime;
+
+        const factor = 1 - Math.exp(-SMOOTH_FACTOR * dt);
+        circleX += (mouseX - circleX) * factor;
+        circleY += (mouseY - circleY) * factor;
+
+        circle.style.transform = `translate3d(${circleX}px, ${circleY}px, 0)`;
+
+        const dx = mouseX - circleX;
+        const dy = mouseY - circleY;
+
+        // Keep loop active until circle catches up within subpixel threshold
+        if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+          rafId = requestAnimationFrame(render);
+        } else {
+          circleX = mouseX;
+          circleY = mouseY;
+          circle.style.transform = `translate3d(${circleX}px, ${circleY}px, 0)`;
+          rafId = null;
+          lastTime = 0;
+        }
+      }
+
+      window.addEventListener('pointermove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        if (!hasMoved) {
+          hasMoved = true;
+          circleX = mouseX;
+          circleY = mouseY;
+          dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+          circle.style.transform = `translate3d(${circleX}px, ${circleY}px, 0)`;
+          dot.style.opacity = '1';
+          circle.style.opacity = '1';
+          return;
+        }
+
+        // Center dot tracks pointer instantaneously without lag
+        dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+
+        if (dot.style.opacity !== '1') {
+          dot.style.opacity = '1';
+          circle.style.opacity = '1';
+        }
+
+        // Follower circle trails smoothly towards the pointer
+        if (!rafId) {
+          lastTime = performance.now();
+          rafId = requestAnimationFrame(render);
+        }
+      }, { passive: true });
+
+      document.addEventListener('mouseleave', () => {
+        dot.style.opacity = '0';
+        circle.style.opacity = '0';
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+          lastTime = 0;
+        }
+      });
+
+      document.addEventListener('mouseenter', (e) => {
+        if (hasMoved) {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          circleX = mouseX;
+          circleY = mouseY;
+          dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+          circle.style.transform = `translate3d(${circleX}px, ${circleY}px, 0)`;
+          dot.style.opacity = '1';
+          circle.style.opacity = '1';
+        }
+      });
+
+      // Hover effect on hyperlinks and interactive buttons
+      document.addEventListener('mouseover', (e) => {
+        const target = e.target;
+        if (!target || !target.closest) return;
+
+        const isLink = target.closest('a, [role="link"], button, [role="button"], .btn');
+        if (isLink) {
+          circle.classList.add('is-hovering');
+        }
+
+        const isInput = target.closest('input, textarea, select, [contenteditable="true"]');
+        if (isInput) {
+          dot.classList.add('cursor-hidden');
+          circle.classList.add('cursor-hidden');
+        }
+      });
+
+      document.addEventListener('mouseout', (e) => {
+        const target = e.target;
+        if (!target || !target.closest) return;
+
+        const isLink = target.closest('a, [role="link"], button, [role="button"], .btn');
+        if (isLink) {
+          circle.classList.remove('is-hovering');
+        }
+
+        const isInput = target.closest('input, textarea, select, [contenteditable="true"]');
+        if (isInput) {
+          dot.classList.remove('cursor-hidden');
+          circle.classList.remove('cursor-hidden');
+        }
+      });
+    }
+  }
+</script>
+
+<style>
+  /* Disabled completely on touch devices, small screens, and mobile */
+  @media (pointer: coarse), (hover: none), (max-width: 768px) {
+    .cursor-dot,
+    .cursor-circle {
+      display: none !important;
+    }
+  }
+
+  /* Disabled when prefers-reduced-motion is active */
+  @media (prefers-reduced-motion: reduce) {
+    .cursor-dot,
+    .cursor-circle {
+      display: none !important;
+    }
+  }
+
+  /* Fine pointer (desktop mouse/trackpad) styles */
+  @media (pointer: fine) and (hover: hover) {
+    :global(html),
+    :global(body),
+    :global(a),
+    :global(button),
+    :global([role="button"]) {
+      cursor: none !important;
+    }
+
+    /* Keep native text selection cursor in inputs and editable areas */
+    :global(input),
+    :global(textarea),
+    :global(select),
+    :global([contenteditable="true"]) {
+      cursor: text !important;
+    }
+
+    .cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      margin: -3px 0 0 -3px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      pointer-events: none;
+      z-index: 10000;
+      opacity: 0;
+      will-change: transform;
+      transition: opacity 0.25s ease, background-color 0.25s ease;
+    }
+
+    .cursor-circle {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 36px;
+      height: 36px;
+      margin: -16px 0 0 -16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent);
+      background-color: transparent;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0;
+      will-change: transform, width, height, margin, box-shadow;
+      transition:
+        width 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+        height 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+        margin 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+        box-shadow 0.35s ease,
+        background-color 0.35s ease,
+        border-color 0.25s ease,
+        opacity 0.25s ease;
+    }
+
+    /* Hover effect over hyperlinks: size expands + light glow */
+    .cursor-circle.is-hovering {
+      width: 50px;
+      height: 50px;
+      margin: -26px 0 0 -26px;
+      box-shadow: 
+        0 0 16px color-mix(in srgb, var(--accent) 55%, transparent),
+        inset 0 0 8px color-mix(in srgb, var(--accent) 25%, transparent);
+      background-color: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+
+    /* Hide custom cursor when interacting with form inputs */
+    .cursor-hidden {
+      opacity: 0 !important;
+    }
+  }
+</style>

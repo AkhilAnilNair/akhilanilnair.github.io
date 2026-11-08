@@ -1,0 +1,99 @@
+---
+// src/components/Education.astro
+import { education, publications } from '../data/content.js';
+---
+<section id="education" class="fade-in">
+  <div class="container">
+    <p class="section-label">Education & Publications</p>
+    <h2 class="section-title">Academic Background</h2>
+
+    <!-- Education -->
+    <div class="subsection">
+      <h3 class="sub-heading">Education</h3>
+      {education.map((edu) => (
+        <div class="edu-item">
+          <div class="edu-main">
+            <p class="edu-degree">{edu.degree}</p>
+            <p class="edu-inst muted">{edu.institution}</p>
+          </div>
+          <span class="mono muted edu-year">{edu.year}</span>
+        </div>
+      ))}
+    </div>
+
+    <!-- Publications -->
+    <div class="subsection">
+      <h3 class="sub-heading">Publications</h3>
+      {publications.map((pub) => (
+        <div class="pub-item">
+          <div class="pub-main">
+            <p class="pub-title">
+              {pub.url
+                ? <a href={pub.url} target="_blank" rel="noopener noreferrer">{pub.title}</a>
+                : pub.title
+              }
+            </p>
+            <p class="pub-venue mono muted">{pub.venue} · {pub.year}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .subsection {
+    margin-bottom: 2.5rem;
+  }
+
+  .sub-heading {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  .edu-item, .pub-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .edu-item:first-of-type, .pub-item:first-of-type {
+    border-top: 1px solid var(--border);
+  }
+
+  .edu-degree {
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .edu-inst {
+    font-size: 0.875rem;
+    margin-top: 0.1rem;
+  }
+
+  .edu-year {
+    font-size: 0.78rem;
+    white-space: nowrap;
+    padding-top: 0.1rem;
+  }
+
+  .pub-title {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .pub-venue {
+    font-size: 0.78rem;
+    margin-top: 0.25rem;
+  }
+</style>

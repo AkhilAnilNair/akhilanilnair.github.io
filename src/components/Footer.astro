@@ -1,0 +1,31 @@
+---
+// src/components/Footer.astro
+import { person } from '../data/content.js';
+const year = new Date().getFullYear();
+---
+<footer class="footer">
+  <div class="container footer-inner">
+    <p class="footer-text muted">
+      © {year} {person.name}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--border);
+    padding-block: 1.75rem;
+    transition: border-color 0.25s ease;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: center;
+  }
+
+  .footer-text {
+    font-size: 0.82rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.03em;
+  }
+</style>

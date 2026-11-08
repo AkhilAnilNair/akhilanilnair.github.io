@@ -1,0 +1,168 @@
+---
+// src/layouts/Layout.astro
+// Base HTML shell. Contains:
+//   - Feature 7: scroll progress bar element
+//   - Feature 8: back-to-top button element
+//   - Feature 2: improved scroll-reveal (prefers-reduced-motion aware)
+//   - Features 7,8,10: bundled <script> for progress, back-to-top, keyboard T
+import '../styles/global.css';
+import CommandPalette from '../components/CommandPalette.astro';
+import CustomCursor from '../components/CustomCursor.astro';
+
+const {
+  title       = "Akhil Anil Nair — Backend Software Engineer",
+  description = "Backend Software Engineer specialising in Java, Spring Boot, and distributed microservices systems.",
+  ogImage     = "/og-image.png",
+  url         = "https://akhilanilnair.dev",
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content={url} />
+  <meta property="og:title"       content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image"       content={ogImage} />
+
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image"       content={ogImage} />
+
+  <title>{title}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!--
+    Theme init — runs BEFORE paint to prevent flash of wrong theme.
+    Reads localStorage first, then falls back to system preference.
+  -->
+  <script is:inline>
+    (function () {
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute(
+        'data-theme',
+        stored || (prefersDark ? 'dark' : 'light')
+      );
+    })();
+  </script>
+</head>
+
+<body>
+  <!-- Feature 7: Scroll progress bar — width set by JS scroll listener -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <slot />
+
+  <!-- Feature 8: Back-to-top — appears after scrolling past the hero -->
+  <button id="back-to-top" aria-label="Back to top" title="Back to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      aria-hidden="true">
+      <polyline points="18 15 12 9 6 15"/>
+    </svg>
+  </button>
+
+  <!-- Feature 9: Command palette modal -->
+  <CommandPalette />
+
+  <!-- Custom Cursor with center dot and lagging circle -->
+  <CustomCursor />
+
+  <!--
+    Feature 2: Scroll-reveal — observe .fade-in elements, add .visible once.
+    Respects prefers-reduced-motion by instantly showing all elements.
+    is:inline so it runs synchronously at end of body (all elements exist).
+  -->
+  <script is:inline>
+    (function () {
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var els = document.querySelectorAll('.fade-in');
+
+      if (reduced) {
+        // Skip animation entirely for users who prefer it
+        els.forEach(function (el) { el.classList.add('visible'); });
+        return;
+      }
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target); // animate only once
+            }
+          });
+        },
+        { threshold: 0.08 }
+      );
+
+      els.forEach(function (el) { observer.observe(el); });
+    })();
+  </script>
+
+  <!--
+    Features 7, 8, 10 live in this bundled script.
+    Runs deferred (after DOM is ready) — no is:inline needed.
+  -->
+  <script>
+    // ── Feature 7: Scroll progress bar ──────────────────────────────
+    const progressBar = document.getElementById('scroll-progress');
+    function updateProgress() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = max > 0
+        ? `${(window.scrollY / max) * 100}%`
+        : '0%';
+    }
+
+    // ── Feature 8: Back-to-top ──────────────────────────────────────
+    const backToTop = document.getElementById('back-to-top');
+    function updateBackToTop() {
+      // Appear once user scrolls past half the viewport height
+      backToTop.classList.toggle('visible', window.scrollY > window.innerHeight * 0.5);
+    }
+    backToTop?.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Shared RAF-throttled scroll handler (avoid multiple listeners)
+    let rafPending = false;
+    window.addEventListener('scroll', () => {
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          updateBackToTop();
+          rafPending = false;
+        });
+      }
+    }, { passive: true });
+
+    // Run once on load in case page starts mid-scroll
+    updateProgress();
+    updateBackToTop();
+
+    // ── Feature 10: Keyboard shortcut "T" to toggle theme ───────────
+    // Ignored when user is typing in a form field or the palette is open.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 't' && e.key !== 'T') return;
+      const tag = document.activeElement?.tagName ?? '';
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+      if (document.activeElement?.isContentEditable) return;
+      // Don't fire when command palette is open (it has its own key handling)
+      if (!document.getElementById('cmd-backdrop')?.hidden) return;
+
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  </script>
+</body>
+</html>

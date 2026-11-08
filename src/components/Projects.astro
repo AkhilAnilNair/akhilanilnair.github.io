@@ -1,0 +1,274 @@
+---
+// src/components/Projects.astro
+// Contains:
+//   - Feature 3: expandable project cards (Details toggle)
+//   - Feature 4: tag filter bar
+//   - Feature 2: staggered fade-in on each card
+import { projects } from '../data/content.js';
+
+// Collect unique tags across all projects for the filter row.
+// "All" is always first; tags appear in the order they first appear.
+const allTags = ['all', ...new Set(projects.flatMap((p) => p.stack).filter(Boolean))];
+---
+<section id="projects" class="fade-in">
+  <div class="container">
+    <p class="section-label">Projects</p>
+    <h2 class="section-title">Selected Work</h2>
+
+    <!-- Feature 4: Filter bar -->
+    <div
+      class="tag-filters"
+      role="group"
+      aria-label="Filter projects by technology"
+    >
+      {allTags.map((tag) => (
+        <button
+          class="filter-btn"
+          data-tag={tag}
+          aria-pressed={tag === 'all' ? 'true' : 'false'}
+        >
+          {tag === 'all' ? 'All' : tag}
+        </button>
+      ))}
+    </div>
+
+    <!-- Project cards grid -->
+    <div class="projects-grid" id="projects-grid">
+      {projects.map((project, i) => (
+        <!--
+          data-tags used by JS filter.
+          fade-in + transition-delay gives a staggered entrance.
+        -->
+        <article
+          class="project-card fade-in"
+          data-tags={project.stack.join(',')}
+          style={`transition-delay: ${i * 0.08}s`}
+        >
+          <!-- Always-visible top section -->
+          <div class="card-top">
+            <h3 class="card-title">{project.title}</h3>
+            <p class="card-desc">{project.description}</p>
+          </div>
+
+          <!-- Stack tags (always visible) -->
+          <div class="tag-row">
+            {project.stack.map((t) => <span class="tag">{t}</span>)}
+          </div>
+
+          <!-- Feature 3: Details toggle button -->
+          <button
+            class="details-toggle"
+            aria-expanded="false"
+            aria-controls={`details-${i}`}
+          >
+            Details
+            <!-- Chevron rotates when expanded (CSS in global.css) -->
+            <span class="toggle-chevron" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </button>
+
+          <!--
+            Feature 3: Expandable detail section.
+            CSS grid trick: grid-template-rows 0fr → 1fr animates the height
+            without JS needing to know the content's pixel height.
+          -->
+          <div class="project-details-wrapper" id={`details-${i}`}>
+            <div class="project-details">
+              <div class="project-details-inner">
+                {project.problem && (
+                  <div class="detail-block">
+                    <span class="detail-label">Problem</span>
+                    <p class="detail-text">{project.problem}</p>
+                  </div>
+                )}
+                {project.approach && (
+                  <div class="detail-block">
+                    <span class="detail-label">Approach</span>
+                    <p class="detail-text">{project.approach}</p>
+                  </div>
+                )}
+                {project.impact && (
+                  <div class="detail-block">
+                    <span class="detail-label">Impact</span>
+                    <p class="detail-text">{project.impact}</p>
+                  </div>
+                )}
+
+                <!-- GitHub / Live links -->
+                <div class="card-links">
+                  {project.github && (
+                    <a href={project.github} target="_blank" rel="noopener noreferrer" class="card-link">
+                      GitHub
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                      </svg>
+                    </a>
+                  )}
+                  {project.live && (
+                    <a href={project.live} target="_blank" rel="noopener noreferrer" class="card-link">
+                      Live
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                      </svg>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // ── Feature 3: Expandable cards ─────────────────────────────────────
+  document.querySelectorAll('.details-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const expanded  = btn.getAttribute('aria-expanded') === 'true';
+      const wrapperId = btn.getAttribute('aria-controls');
+      const wrapper   = document.getElementById(wrapperId);
+
+      btn.setAttribute('aria-expanded', String(!expanded));
+      wrapper?.classList.toggle('open', !expanded);
+    });
+  });
+
+  // ── Feature 4: Tag filter ────────────────────────────────────────────
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards      = document.querySelectorAll('.project-card');
+  const reduced    = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function applyFilter(selectedTag) {
+    // Update button pressed states
+    filterBtns.forEach((btn) => {
+      const active = btn.dataset.tag === selectedTag;
+      btn.setAttribute('aria-pressed', String(active));
+    });
+
+    if (reduced) {
+      // No animation — just show/hide immediately
+      cards.forEach((card) => {
+        const tags = card.dataset.tags ? card.dataset.tags.split(',') : [];
+        const show = selectedTag === 'all' || tags.includes(selectedTag);
+        card.hidden = !show;
+      });
+      return;
+    }
+
+    // Fade all cards out, swap visibility, fade back in
+    cards.forEach((card) => card.classList.add('is-filtering'));
+
+    setTimeout(() => {
+      cards.forEach((card) => {
+        const tags = card.dataset.tags ? card.dataset.tags.split(',') : [];
+        const show = selectedTag === 'all' || tags.includes(selectedTag);
+        card.hidden = !show;
+        card.classList.remove('is-filtering');
+      });
+    }, 180); // matches the 0.2s CSS opacity transition
+  }
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => applyFilter(btn.dataset.tag));
+  });
+</script>
+
+<style>
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+    gap: 1.25rem;
+  }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    /* opacity/border transitions in global.css */
+    transition: border-color 0.2s, opacity 0.2s ease,
+                background-color 0.25s ease;
+  }
+  .project-card:hover {
+    border-color: var(--accent);
+  }
+
+  .card-top { display: flex; flex-direction: column; gap: 0.3rem; }
+
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  /* ── Detail blocks inside the expandable section ── */
+  .detail-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .detail-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+
+  .detail-text {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .card-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .card-link:hover { opacity: 0.75; }
+</style>

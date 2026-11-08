@@ -1,0 +1,54 @@
+---
+// src/components/Skills.astro
+import { skills } from '../data/content.js';
+---
+<section id="skills" class="fade-in">
+  <div class="container">
+    <p class="section-label">Skills</p>
+    <h2 class="section-title">Technical Skills</h2>
+
+    <div class="skills-grid">
+      {skills.map((group) => (
+        <div class="skill-group">
+          <h3 class="group-name">{group.group}</h3>
+          <ul class="skill-list" role="list">
+            {group.items.map((item) => (
+              <li class="skill-item">
+                <span class="tag">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 2rem 2.5rem;
+  }
+
+  .group-name {
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.85rem;
+    font-weight: 500;
+  }
+
+  .skill-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .skill-item {
+    /* tag already styled in global.css */
+  }
+</style>

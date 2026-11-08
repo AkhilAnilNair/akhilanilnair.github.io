@@ -1,0 +1,303 @@
+---
+// src/components/Navbar.astro
+// Contains:
+//   - Feature 1: scroll-spy (bundled <script>)
+//   - Feature 6: improved mobile nav — focus trap, Escape, outside click
+//   - Feature 9: cmd-trigger button that opens the command palette
+import ThemeToggle from './ThemeToggle.astro';
+import { nav, person } from '../data/content.js';
+---
+<header class="navbar">
+  <nav class="container nav-inner" aria-label="Main navigation">
+
+    <!-- Logo -->
+    <a href="#hero" class="nav-logo" aria-label="Back to top">
+      {person.name.split(' ')[0]}<span class="accent">.</span>
+    </a>
+
+    <!-- Desktop links -->
+    <ul class="nav-links" role="list">
+      {nav.map((item) => (
+        <li>
+          <a href={item.href} class="nav-link">{item.label}</a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Right-side actions -->
+    <div class="nav-actions">
+      <!--
+        Feature 9: Opens the command palette; dispatches 'cmd:open' event
+        so CommandPalette.astro's script handles the actual open logic.
+      -->
+      <button
+        class="cmd-trigger"
+        id="cmd-trigger"
+        aria-label="Open command palette"
+        title="Command Palette"
+      >
+        <!-- Search icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span class="cmd-trigger-kbd">⌘K</span>
+      </button>
+
+      <ThemeToggle />
+    </div>
+
+    <!--
+      Feature 6: Hamburger — aria-expanded updated by JS.
+      aria-controls links the button to the menu it controls.
+    -->
+    <button
+      class="hamburger"
+      id="hamburger"
+      aria-label="Open navigation menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </button>
+  </nav>
+
+  <!--
+    Feature 6: Mobile menu.
+    hidden keeps it out of the tab order and accessibility tree when closed.
+  -->
+  <div
+    class="mobile-menu"
+    id="mobile-menu"
+    role="region"
+    aria-label="Navigation menu"
+    hidden
+  >
+    <ul role="list">
+      {nav.map((item) => (
+        <li>
+          <a href={item.href} class="mobile-link">{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</header>
+
+<script>
+  // ── Feature 6: Mobile navigation ────────────────────────────────────
+  const hamburger = document.getElementById('hamburger');
+  const menu      = document.getElementById('mobile-menu');
+
+  function getFocusable() {
+    return [...(menu?.querySelectorAll('a[href], button') ?? [])];
+  }
+
+  function openMenu() {
+    if (!menu || !hamburger) return;
+    menu.hidden = false;
+    hamburger.setAttribute('aria-expanded', 'true');
+    hamburger.setAttribute('aria-label', 'Close navigation menu');
+    // Move focus to first link so keyboard users are inside the menu
+    getFocusable()[0]?.focus();
+  }
+
+  function closeMenu() {
+    if (!menu || !hamburger) return;
+    menu.hidden = true;
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', 'Open navigation menu');
+    hamburger.focus(); // return focus to trigger
+  }
+
+  hamburger?.addEventListener('click', () => {
+    menu?.hidden ? openMenu() : closeMenu();
+  });
+
+  // Close when a nav link is clicked (smooth scroll handles the rest)
+  menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu && !menu.hidden) {
+      e.stopPropagation(); // don't also close command palette
+      closeMenu();
+    }
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (!menu || menu.hidden) return;
+    const target = e.target;
+    if (!menu.contains(target) && !hamburger?.contains(target)) {
+      closeMenu();
+    }
+  });
+
+  // Focus trap — Tab cycles within the open menu
+  menu?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const items = getFocusable();
+    if (!items.length) return;
+    const first = items[0];
+    const last  = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  // ── Feature 1: Scroll-spy ────────────────────────────────────────────
+  // Highlights the nav link whose section is currently at the top of viewport.
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('main > section[id]');
+  const NAV_H    = 72; // px — nav height + small buffer
+
+  function updateSpy() {
+    let current = '';
+    sections.forEach((section) => {
+      // A section is "active" once its top edge scrolls above the offset
+      if (window.scrollY >= section.offsetTop - NAV_H) {
+        current = section.id;
+      }
+    });
+    navLinks.forEach((link) => {
+      link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+    });
+  }
+
+  // Throttle with rAF so we don't fire too often
+  let spyRaf = false;
+  window.addEventListener('scroll', () => {
+    if (!spyRaf) {
+      spyRaf = true;
+      requestAnimationFrame(() => { updateSpy(); spyRaf = false; });
+    }
+  }, { passive: true });
+
+  updateSpy(); // run once on load
+
+  // ── Feature 9: cmd-trigger button ───────────────────────────────────
+  // Dispatches a custom event; CommandPalette.astro listens for it.
+  document.getElementById('cmd-trigger')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('cmd:open'));
+  });
+</script>
+
+<style>
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .navbar:hover {
+    border-bottom-color: var(--accent);
+    box-shadow: 0 4px 20px -10px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: var(--nav-h);
+  }
+
+  .nav-logo {
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+  }
+  .nav-logo:hover {
+    color: var(--accent);
+  }
+  .nav-logo .accent { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 0.15rem;
+    margin-left: auto;
+  }
+
+  .nav-link {
+    font-size: 0.875rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+  }
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--accent);
+  }
+  /* .nav-link.active is styled in global.css (Feature 1) */
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* ── Hamburger ── */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    margin-left: auto;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+
+  /* ── Mobile menu ── */
+  .mobile-menu {
+    border-top: 1px solid var(--border);
+    padding: 1rem 1.25rem 1.25rem;
+    background: var(--bg);
+    transition: background-color 0.25s ease;
+  }
+  .mobile-menu ul { list-style: none; display: flex; flex-direction: column; gap: 0.15rem; }
+
+  .mobile-link {
+    display: block;
+    padding: 0.5rem 0.25rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+  }
+  .mobile-link:hover { color: var(--text); }
+
+  /* ── Responsive breakpoint ── */
+  @media (max-width: 700px) {
+    .nav-links  { display: none; }
+    .hamburger  { display: flex; }
+    /* Keep the cmd-trigger + theme toggle visible even on mobile */
+    .nav-actions { margin-left: auto; }
+  }
+</style>

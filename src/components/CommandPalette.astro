@@ -1,0 +1,278 @@
+---
+// src/components/CommandPalette.astro
+// Feature 9: Cmd/Ctrl+K command palette.
+// Imports content.js via bundled <script> so URLs stay in one place.
+---
+
+<!--
+  role="dialog" + aria-modal="true" tell screen readers this is a modal.
+  hidden attribute is toggled by JS; global.css overrides display:none correctly.
+-->
+<div
+  id="cmd-backdrop"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Command palette"
+  hidden
+>
+  <div id="cmd-modal">
+    <!-- Search row -->
+    <div id="cmd-input-wrap">
+      <!-- Search icon -->
+      <svg id="cmd-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+
+      <label for="cmd-input" class="sr-only">Search commands</label>
+      <input
+        type="search"
+        id="cmd-input"
+        placeholder="Search commands…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-controls="cmd-list"
+        aria-autocomplete="list"
+      />
+    </div>
+
+    <!-- Results list (populated by JS) -->
+    <ul id="cmd-list" role="listbox" aria-label="Commands"></ul>
+
+    <!-- Empty state -->
+    <p id="cmd-empty" hidden>No results</p>
+
+    <!-- Keyboard hints -->
+    <div id="cmd-footer" aria-hidden="true">
+      <span class="cmd-footer-hint"><kbd>↑↓</kbd> navigate</span>
+      <span class="cmd-footer-hint"><kbd>↵</kbd> select</span>
+      <span class="cmd-footer-hint"><kbd>Esc</kbd> close</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // This script is bundled by Astro/Vite — it can import ES modules.
+  import { nav, person } from '../data/content.js';
+
+  /* ── Build command list from content.js ── */
+  const COMMANDS = [
+    // Section navigation — generated from the nav array
+    ...nav.map((item) => ({
+      id:    item.href,
+      label: `Go to ${item.label}`,
+      icon:  'nav',
+      action() {
+        document.querySelector(item.href)?.scrollIntoView({ behavior: 'smooth' });
+      },
+    })),
+
+    // Theme toggle (same logic as ThemeToggle.astro + keyboard shortcut T)
+    {
+      id:    'toggle-theme',
+      label: 'Toggle Theme',
+      icon:  'theme',
+      hint:  'T',
+      action() {
+        const html = document.documentElement;
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+      },
+    },
+
+    // External links — only added if URL is not empty/placeholder
+    ...(person.github && !person.github.includes('your-handle') ? [{
+      id:    'open-github',
+      label: 'Open GitHub',
+      icon:  'external',
+      action() { window.open(person.github, '_blank', 'noopener,noreferrer'); },
+    }] : []),
+
+    ...(person.linkedin && !person.linkedin.includes('your-handle') ? [{
+      id:    'open-linkedin',
+      label: 'Open LinkedIn',
+      icon:  'external',
+      action() { window.open(person.linkedin, '_blank', 'noopener,noreferrer'); },
+    }] : []),
+
+    ...(person.email && !person.email.includes('example.com') ? [{
+      id:    'copy-email',
+      label: 'Copy Email Address',
+      icon:  'copy',
+      action() {
+        navigator.clipboard?.writeText(person.email).catch(() => {});
+      },
+    }] : []),
+  ];
+
+  /* ── Inline SVG icons ── */
+  function icon(type) {
+    const map = {
+      nav: `<svg class="cmd-item-icon" width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>`,
+      theme: `<svg class="cmd-item-icon" width="14" height="14" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+              </svg>`,
+      external: `<svg class="cmd-item-icon" width="14" height="14" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                   <polyline points="15 3 21 3 21 9"/>
+                   <line x1="10" y1="14" x2="21" y2="3"/>
+                 </svg>`,
+      copy: `<svg class="cmd-item-icon" width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+             </svg>`,
+    };
+    return map[type] ?? map.nav;
+  }
+
+  /* ── State ── */
+  let filtered    = [...COMMANDS];
+  let activeIndex = 0;
+  let lastFocused = null; // element to restore focus to on close
+
+  const backdrop = document.getElementById('cmd-backdrop');
+  const modal    = document.getElementById('cmd-modal');
+  const input    = document.getElementById('cmd-input');
+  const list     = document.getElementById('cmd-list');
+  const empty    = document.getElementById('cmd-empty');
+
+  /* ── Render ── */
+  function render(query = '') {
+    const q = query.trim().toLowerCase();
+    filtered = q
+      ? COMMANDS.filter((c) => c.label.toLowerCase().includes(q))
+      : [...COMMANDS];
+    activeIndex = 0;
+
+    empty.hidden = filtered.length > 0;
+
+    list.innerHTML = filtered
+      .map(
+        (cmd, i) => `
+        <li
+          role="option"
+          class="cmd-item"
+          aria-selected="${i === 0 ? 'true' : 'false'}"
+          data-index="${i}"
+        >
+          ${icon(cmd.icon)}
+          <span>${cmd.label}</span>
+          ${cmd.hint ? `<kbd class="cmd-hint">${cmd.hint}</kbd>` : ''}
+        </li>`
+      )
+      .join('');
+
+    // Attach click + hover listeners to new items
+    list.querySelectorAll('.cmd-item').forEach((item, i) => {
+      item.addEventListener('click',      () => run(i));
+      item.addEventListener('mouseenter', () => setActive(i));
+    });
+  }
+
+  function setActive(index) {
+    activeIndex = Math.max(0, Math.min(index, filtered.length - 1));
+    list.querySelectorAll('.cmd-item').forEach((item, i) => {
+      item.setAttribute('aria-selected', i === activeIndex ? 'true' : 'false');
+    });
+    // Scroll the active item into view without scrolling the page
+    list.querySelectorAll('.cmd-item')[activeIndex]?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function run(index) {
+    filtered[index]?.action();
+    close();
+  }
+
+  /* ── Open / close ── */
+  function open() {
+    lastFocused = document.activeElement;
+    backdrop.hidden = false;
+    document.body.style.overflow = 'hidden'; // prevent background scroll
+    input.value = '';
+    render();
+    input.focus();
+  }
+
+  function close() {
+    backdrop.hidden = true;
+    document.body.style.overflow = '';
+    lastFocused?.focus(); // return focus to trigger element
+  }
+
+  /* ── Global keyboard listeners ── */
+  document.addEventListener('keydown', (e) => {
+    // Open with Ctrl/Cmd+K
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      backdrop.hidden ? open() : close();
+      return;
+    }
+
+    // All other keys only matter when palette is open
+    if (backdrop.hidden) return;
+
+    switch (e.key) {
+      case 'Escape':
+        e.preventDefault();
+        close();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        setActive(activeIndex + 1);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setActive(activeIndex - 1);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        run(activeIndex);
+        break;
+      case 'Tab': {
+        // Focus trap: cycle between input and list items
+        const focusable = [...modal.querySelectorAll('input, [role="option"]')];
+        const first = focusable[0];
+        const last  = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+        break;
+      }
+    }
+  });
+
+  // Close on backdrop click (outside modal)
+  backdrop?.addEventListener('click', (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  // Filter as user types
+  input?.addEventListener('input', (e) => render(e.target.value));
+
+  // Open from navbar cmd-trigger button (dispatched in Navbar.astro)
+  window.addEventListener('cmd:open', open);
+</script>
