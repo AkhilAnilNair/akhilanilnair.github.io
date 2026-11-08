@@ -204,7 +204,12 @@
   }
 
   /* ── Open / close ── */
+  function isMobile() {
+    return window.matchMedia('(max-width: 768px)').matches;
+  }
+
   function open() {
+    if (isMobile()) return;
     lastFocused = document.activeElement;
     backdrop.hidden = false;
     document.body.style.overflow = 'hidden'; // prevent background scroll
